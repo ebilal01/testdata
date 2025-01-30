@@ -1,4 +1,0 @@
-Flask
-eventlet
-requests
-structlog
