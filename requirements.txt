@@ -1,4 +1,5 @@
 Flask
-eventlet
+gunicorn
+flask-cors
 requests
 structlog
