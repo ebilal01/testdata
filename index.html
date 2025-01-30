@@ -17,11 +17,11 @@
 
         def send_test_message(event):
             url = "https://simulation-hello-world-2025.onrender.com/rockblock"
-            imei = "300434065264590"  # Valid IMEI
-            test_data = "01020304" + "0001" + "3F800000" + "BF800000" + "00000000" + "03E8" + "0190" + "00C8" + "00B4" + "00A0" + "0002" + "0003" + "0004" + "0005" + "0006" + "0007" + "0008" + "0009" + "000A"  # Example hex data
-            
-            payload = f"imei={imei}&data={test_data}"  # Form the correct payload
-            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            payload = {
+                "imei": "300434065264590",
+                "data": "0102030400013F800000BF8000000000000003E8019000C800B400A000020003000400050006000700080009000A"
+            }
+            headers = {"Content-Type": "application/json"}  # Explicitly set JSON content type
 
             async def fetch_data():
                 try:
@@ -30,7 +30,7 @@
                     response = await js.fetch(url, {
                         "method": "POST",
                         "headers": headers,
-                        "body": payload
+                        "body": js.JSON.stringify(payload)  # Convert payload to JSON
                     })
 
                     if response.ok:
@@ -50,4 +50,5 @@
     </script>
 </body>
 </html>
+
 
