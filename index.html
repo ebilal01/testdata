@@ -3,47 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RockBlock Test Message</title>
-    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <title>RockBlock Message Sender</title>
+    <script type="module" src="https://pyscript.net/latest/pyscript.js"></script>
 </head>
 <body>
-    <h1>RockBlock Test Message Sender</h1>
-    <button id="send-btn">Send Test Message</button>
-    <p id="status">Waiting for action...</p>
+    <h1>RockBlock Message Sender</h1>
+    <button id="sendButton" py-click="send_message">Send Test Message</button>
+    <p id="status">Message status: Not sent</p>
 
-    <script type="py">
-        from pyscript import document
+    <py-script>
         import js
+        import asyncio
+        import urllib.parse
+        from pyodide.http import pyfetch
 
-        def send_test_message(event):
-            url = "https://simulation-hello-world-2025.onrender.com/rockblock"
-            imei = "300434065264590"  # The valid IMEI
-            test_data = "01020304" + "0001" + "3F800000" + "BF800000" + "00000000" + "03E8" + "0190" + "00C8" + "00B4" + "00A0" + "0002" + "0003" + "0004" + "0005" + "0006" + "0007" + "0008" + "0009" + "000A"  # Example hex data
+        async def send_message():
+            base_url = "https://simulation-hello-world-2025.onrender.com/rockblock"
+            imei = "300434065264590"
+            data = "01020304"  # Example hex data
 
-            full_url = f"{url}?imei={imei}&data={test_data}"
+            params = urllib.parse.urlencode({"imei": imei, "data": data})
+            url = f"{base_url}?{params}"
 
-            async def fetch_data():
-                try:
-                    document.querySelector("#status").innerText = "Sending message..."
-                    response = await js.fetch(full_url, {"method": "POST"})
+            try:
+                response = await pyfetch(url, method="POST", headers={"Content-Type": "application/x-www-form-urlencoded"})
+                result = await response.text()
 
-                    if response.ok:
-                        text = await response.text()
-                        document.querySelector("#status").innerText = f"✅ Success! Response: {text}"
-                    else:
-                        text = await response.text()
-                        document.querySelector("#status").innerText = f"❌ Failed! Server responded with {response.status}: {text}"
+                if response.status == 200:
+                    js.document.getElementById("status").textContent = "Message sent successfully!"
+                else:
+                    js.document.getElementById("status").textContent = f"Error: {result}"
+            except Exception as e:
+                js.document.getElementById("status").textContent = f"Request failed: {str(e)}"
 
-                except Exception as e:
-                    document.querySelector("#status").innerText = f"❌ Error: {str(e)}"
-
-            js.console.log("Sending test message...")
-            fetch_data()
-
-        document.querySelector("#send-btn").addEventListener("click", send_test_message)
-    </script>
+    </py-script>
 </body>
 </html>
+
 
 
 
