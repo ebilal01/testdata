@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test RockBlock Transmission</title>
-    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <title>RockBlock Test</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='format.css') }}">
 </head>
 <body>
-    <h1>RockBlock Test Message Sender</h1>
-    <button id="send-btn">Send Test Message</button>
-    <p id="response"></p>
+    <h1>RockBlock Test Message</h1>
+    
+    <button id="sendMessage">Send Test Message</button>
+    <p id="statusMessage">No message sent yet.</p>
 
-    <script type="py">
-        from pyscript import document
-        import js
+    <script>
+        document.getElementById('sendMessage').addEventListener('click', async function() {
+            document.getElementById('statusMessage').textContent = "Sending message...";
+            
+            const testData = {
+                imei: "300434065264590",
+                data: "0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F20"
+            };
 
-        def send_test_message(event):
-            url = "https://simulation-hello-world-2025.onrender.com/rockblock"
-            imei = "300434065264590"  # The valid IMEI
-            test_data = "01020304" + "0001" + "3F800000" + "BF800000" + "00000000" + "03E8" + "0190" + "00C8" + "00B4" + "00A0" + "0002" + "0003" + "0004" + "0005" + "0006" + "0007" + "0008" + "0009" + "000A"  # Example hex data
+            try {
+                const response = await fetch('/rockblock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(testData)
+                });
 
-            full_url = f"{url}?imei={imei}&data={test_data}"
-
-            async def fetch_data():
-                try:
-                    response = await js.fetch(full_url, {"method": "POST"})
-                    text = await response.text()
-                    document.querySelector("#response").innerText = f"Response: {text}"
-                except Exception as e:
-                    document.querySelector("#response").innerText = f"Error: {str(e)}"
-
-            js.console.log("Sending test message...")
-            fetch_data()
-
-        document.querySelector("#send-btn").addEventListener("click", send_test_message)
+                const result = await response.json();
+                document.getElementById('statusMessage').textContent = result.message;
+            } catch (error) {
+                console.error("Error sending message:", error);
+                document.getElementById('statusMessage').textContent = "Error sending message.";
+            }
+        });
     </script>
 </body>
 </html>
+
 
