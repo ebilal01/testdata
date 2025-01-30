@@ -3,42 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RockBlock Message Sender</title>
-    <script type="module" src="https://pyscript.net/latest/pyscript.js"></script>
+    <title>Message Sender</title>
 </head>
 <body>
-    <h1>RockBlock Message Sender</h1>
-    <button id="sendButton" py-click="send_message">Send Test Message</button>
-    <p id="status">Message status: Not sent</p>
+    <h1>RockBlock Test Message Sender</h1>
 
-    <py-script>
-        import js
-        import asyncio
-        import urllib.parse
-        from pyodide.http import pyfetch
+    <!-- Input field for message -->
+    <input type="text" id="messageInput" placeholder="Enter message">
+    <button onclick="sendMessage()">Send Message</button>
+    
+    <!-- Message confirmation -->
+    <p id="statusMessage"></p>
 
-        async def send_message():
-            base_url = "https://simulation-hello-world-2025.onrender.com/rockblock"
-            imei = "300434065264590"
-            data = "01020304"  # Example hex data
+    <script>
+        const baseURL = 'https://simulation-hello-world-2025.onrender.com'; // Update this if needed
 
-            params = urllib.parse.urlencode({"imei": imei, "data": data})
-            url = f"{base_url}?{params}"
+        async function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            const imei = "300434065264590";  // Simulated IMEI
+            
+            if (!message) {
+                alert("Please enter a message before sending.");
+                return;
+            }
 
-            try:
-                response = await pyfetch(url, method="POST", headers={"Content-Type": "application/x-www-form-urlencoded"})
-                result = await response.text()
+            try {
+                const response = await fetch(`${baseURL}/rockblock?imei=${imei}&data=${encodeURIComponent(message)}`, {
+                    method: "POST"
+                });
 
-                if response.status == 200:
-                    js.document.getElementById("status").textContent = "Message sent successfully!"
-                else:
-                    js.document.getElementById("status").textContent = f"Error: {result}"
-            except Exception as e:
-                js.document.getElementById("status").textContent = f"Request failed: {str(e)}"
+                const text = await response.text();
+                console.log("Server Response:", text);
 
-    </py-script>
+                if (response.ok) {
+                    document.getElementById("statusMessage").textContent = "✅ Message Sent!";
+                } else {
+                    document.getElementById("statusMessage").textContent = "❌ Failed to send message.";
+                }
+            } catch (error) {
+                console.error("Error sending message:", error);
+                document.getElementById("statusMessage").textContent = "❌ Error contacting server.";
+            }
+        }
+    </script>
 </body>
 </html>
+
+
 
 
 
