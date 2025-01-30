@@ -17,11 +17,14 @@
 
         def send_test_message(event):
             url = "https://simulation-hello-world-2025.onrender.com/rockblock"
-            payload = {
-                "imei": "300434065264590",
-                "data": "0102030400013F800000BF8000000000000003E8019000C800B400A000020003000400050006000700080009000A"
-            }
-            headers = {"Content-Type": "application/json"}  # Explicitly set JSON content type
+            
+            imei = "300434065264590"
+            data = "0102030400013F800000BF8000000000000003E8019000C800B400A000020003000400050006000700080009000A"
+
+            # Encode data as a URL-encoded string
+            body_data = f"imei={imei}&data={data}"
+
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}  # Correct content type
 
             async def fetch_data():
                 try:
@@ -30,7 +33,7 @@
                     response = await js.fetch(url, {
                         "method": "POST",
                         "headers": headers,
-                        "body": js.JSON.stringify(payload)  # Convert payload to JSON
+                        "body": body_data  # Send as a URL-encoded string
                     })
 
                     if response.ok:
@@ -50,5 +53,6 @@
     </script>
 </body>
 </html>
+
 
 
