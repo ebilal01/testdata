@@ -47,24 +47,32 @@
         }
 
         async function sendMessage() {
-            const messageHex = generateValidHexMessage();
+    const userMessage = document.getElementById("message-input").value; // Get input text
+    const encodedMessage = new TextEncoder().encode(userMessage); // Convert to bytes
+    const hexMessage = Array.from(encodedMessage)
+        .map(byte => byte.toString(16).padStart(2, '0'))
+        .join('');
 
-            try {
-                const response = await fetch(`${BASE_URL}/rockblock?imei=300434065264590&data=${messageHex}`, {
-                    method: 'POST'
-                });
+    // Generate valid hex data + user message
+    const messageHex = generateValidHexMessage() + hexMessage;  
 
-                if (response.ok) {
-                    document.getElementById("status").textContent = "Message sent successfully!";
-                    fetchLatestMessage(); // Refresh latest message
-                } else {
-                    document.getElementById("status").textContent = "Failed to send message.";
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                document.getElementById("status").textContent = "Error sending message.";
-            }
+    try {
+        const response = await fetch(`${BASE_URL}/rockblock?imei=300434065264590&data=${messageHex}`, {
+            method: 'POST'
+        });
+
+        if (response.ok) {
+            document.getElementById("status").textContent = "Message sent successfully!";
+            fetchLatestMessage(); // Refresh display
+        } else {
+            document.getElementById("status").textContent = "Failed to send message.";
         }
+    } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("status").textContent = "Error sending message.";
+    }
+}
+
 
         async function fetchLatestMessage() {
             try {
