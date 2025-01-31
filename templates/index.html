@@ -23,7 +23,13 @@
     </div>
 
     <script>
-        const BASE_URL = 'https://testdata123456789.onrender.com'; // Replace with your actual Render URL
+        const BASE_URL = 'https://simulation-hello-world-2025.onrender.com'; // Second site's URL
+
+        function textToHex(text) {
+            return Array.from(text)
+                .map(char => char.charCodeAt(0).toString(16).padStart(2, '0'))
+                .join('');
+        }
 
         async function sendMessage() {
             const messageInput = document.getElementById("message-input").value;
@@ -32,8 +38,10 @@
                 return;
             }
 
+            const hexData = textToHex(messageInput); // Convert text to hex format
+
             try {
-                const response = await fetch(`${BASE_URL}/rockblock?imei=300434065264590&data=${encodeURIComponent(messageInput)}`, {
+                const response = await fetch(`${BASE_URL}/rockblock?imei=300434065264590&data=${hexData}`, {
                     method: 'POST'
                 });
 
@@ -72,6 +80,3 @@
     </script>
 </body>
 </html>
-
-
-
