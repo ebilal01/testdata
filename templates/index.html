@@ -25,23 +25,32 @@
     <script>
         const BASE_URL = 'https://simulation-hello-world-2025.onrender.com'; // Second site's URL
 
-        function textToHex(text) {
-            return Array.from(text)
-                .map(char => char.charCodeAt(0).toString(16).padStart(2, '0'))
+        function generateValidHexMessage() {
+            // Generate a valid 50-byte structured binary message (dummy test values)
+            const buffer = new ArrayBuffer(50);
+            const view = new DataView(buffer);
+
+            // Fill in with fake but valid values
+            view.setUint32(0, Math.floor(Date.now() / 1000), true); // Unix timestamp
+            view.setInt16(4, 8, true); // SIV
+            view.setFloat32(6, 37.7749, true); // Latitude
+            view.setFloat32(10, -122.4194, true); // Longitude
+            view.setUint16(14, 500, true); // Altitude
+            for (let i = 16; i < 50; i += 2) {
+                view.setInt16(i, i * 2, true); // Dummy sensor data
+            }
+
+            // Convert to hex string
+            return [...new Uint8Array(buffer)]
+                .map(byte => byte.toString(16).padStart(2, '0'))
                 .join('');
         }
 
         async function sendMessage() {
-            const messageInput = document.getElementById("message-input").value;
-            if (!messageInput) {
-                alert("Please enter a message.");
-                return;
-            }
-
-            const hexData = textToHex(messageInput); // Convert text to hex format
+            const messageHex = generateValidHexMessage();
 
             try {
-                const response = await fetch(`${BASE_URL}/rockblock?imei=300434065264590&data=${hexData}`, {
+                const response = await fetch(`${BASE_URL}/rockblock?imei=300434065264590&data=${messageHex}`, {
                     method: 'POST'
                 });
 
@@ -80,3 +89,4 @@
     </script>
 </body>
 </html>
+
