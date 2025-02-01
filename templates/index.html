@@ -23,7 +23,8 @@
     </div>
 
     <script>
-        const BASE_URL = 'https://simulation-hello-world-2025.onrender.com'; // Second site's URL
+        const BASE_URL_HELLO_WORLD = 'https://simulation-hello-world-2025.onrender.com';
+        const BASE_URL_TUFTS_ANEMOMETER2 = 'https://tufts-anemometer2.onrender.com';
 
         function generateValidHexMessage() {
             // Generate a valid 50-byte structured binary message (dummy test values)
@@ -47,36 +48,42 @@
         }
 
         async function sendMessage() {
-    const userMessage = document.getElementById("message-input").value; // Get input text
-    const encodedMessage = new TextEncoder().encode(userMessage); // Convert to bytes
-    const hexMessage = Array.from(encodedMessage)
-        .map(byte => byte.toString(16).padStart(2, '0'))
-        .join('');
+            const userMessage = document.getElementById("message-input").value; // Get input text
+            const encodedMessage = new TextEncoder().encode(userMessage); // Convert to bytes
+            const hexMessage = Array.from(encodedMessage)
+                .map(byte => byte.toString(16).padStart(2, '0'))
+                .join('');
 
-    // Generate valid hex data + user message
-    const messageHex = generateValidHexMessage() + hexMessage;  
+            // Generate valid hex data + user message
+            const messageHex = generateValidHexMessage() + hexMessage;  
 
-    try {
-        const response = await fetch(`${BASE_URL}/rockblock?imei=300434065264590&data=${messageHex}`, {
-            method: 'POST'
-        });
+            try {
+                // Send to hello world site
+                const response1 = await fetch(`${BASE_URL_HELLO_WORLD}/rockblock?imei=300434065264590&data=${messageHex}`, {
+                    method: 'POST'
+                });
 
-        if (response.ok) {
-            document.getElementById("status").textContent = "Message sent successfully!";
-            fetchLatestMessage(); // Refresh display
-        } else {
-            document.getElementById("status").textContent = "Failed to send message.";
+                // Send to tufts anemometer site
+                const response2 = await fetch(`${BASE_URL_TUFTS_ANEMOMETER2}/rockblock?imei=300434065264590&data=${messageHex}`, {
+                    method: 'POST'
+                });
+
+                if (response1.ok && response2.ok) {
+                    document.getElementById("status").textContent = "Message sent successfully to both sites!";
+                } else {
+                    document.getElementById("status").textContent = "Failed to send message to one or both sites.";
+                }
+
+                fetchLatestMessage(); // Refresh display
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("status").textContent = "Error sending message.";
+            }
         }
-    } catch (error) {
-        console.error("Error:", error);
-        document.getElementById("status").textContent = "Error sending message.";
-    }
-}
-
 
         async function fetchLatestMessage() {
             try {
-                const response = await fetch(`${BASE_URL}/live-data`);
+                const response = await fetch(`${BASE_URL_HELLO_WORLD}/live-data`);
                 if (!response.ok) throw new Error('Failed to fetch live data');
                 const data = await response.json();
 
@@ -97,4 +104,6 @@
     </script>
 </body>
 </html>
+
+
 
