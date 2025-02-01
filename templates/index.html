@@ -34,8 +34,8 @@
             // Fill in with fake but valid values
             view.setUint32(0, Math.floor(Date.now() / 1000), true); // Unix timestamp
             view.setInt16(4, 8, true); // SIV
-            view.setFloat32(6, 37.7749, true); // Latitude
-            view.setFloat32(10, -122.4194, true); // Longitude
+            view.setFloat32(6, 37, true); // Latitude
+            view.setFloat32(10, -122, true); // Longitude
             view.setUint16(14, 500, true); // Altitude
             for (let i = 16; i < 50; i += 2) {
                 view.setInt16(i, i * 2, true); // Dummy sensor data
